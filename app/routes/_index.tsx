@@ -19,17 +19,12 @@ export default function Index() {
   let submit = useSubmit();
   let todos = useLoaderData<typeof loader>();
   let fetchers = useFetchers();
+
   let optimisticTodos = fetchers.reduce<{ id: string }[]>((memo, f) => {
     let id = f.formData?.get("id");
 
-    if (todos.map((t) => t.id).includes(id)) {
-      console.log(todos);
-      console.log(fetchers);
-      console.log(`Todo ${id} is in both!`);
-      debugger;
-    }
-
-    if (typeof id === "string") {
+    // race condition: only include pending todos that haven't already been revalidated by earlier fetchers
+    if (typeof id === "string" && !todos.map((t) => t.id).includes(id)) {
       memo.push({ id });
     }
 
