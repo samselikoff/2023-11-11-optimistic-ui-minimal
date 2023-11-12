@@ -39,12 +39,9 @@ export default function Index() {
         onSubmit={(e) => {
           e.preventDefault();
 
-          let tempId = window.crypto.randomUUID();
+          let id = `${todos.length}`;
 
-          submit(
-            { id: tempId },
-            { method: "POST", fetcherKey: tempId, navigate: false }
-          );
+          submit({ id }, { method: "POST", fetcherKey: id, navigate: false });
         }}
       >
         <button className="bg-sky-500 text-white font-medium px-3 py-2">
@@ -66,7 +63,7 @@ export default function Index() {
                   optimisticTodos.includes(todo) ? "opacity-25" : ""
                 }`}
               >
-                {todo.id}
+                Todo {todo.id}
               </li>
             ))}
         </ul>
