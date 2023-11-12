@@ -25,10 +25,10 @@ export default function Index() {
     let id = f.formData?.get("id");
 
     if (todos.map((t) => t.id).includes(id)) {
-      console.log(todos);
-      console.log(fetchers);
-      debugger;
-      // console.log("BUG");
+      // console.log(todos);
+      // console.log(fetchers);
+      console.log(`Todo ${id} is in both!`);
+      // debugger;
     }
 
     if (typeof id === "string") {
@@ -39,10 +39,6 @@ export default function Index() {
   }, []);
 
   todos = [...todos, ...optimisticTodos];
-
-  // console.log(
-  //   todos.map((t) => `${t.id} ${optimisticTodos.includes(t) ? "*" : ""}`)
-  // );
 
   return (
     <div className="max-w-lg mx-auto p-8">
