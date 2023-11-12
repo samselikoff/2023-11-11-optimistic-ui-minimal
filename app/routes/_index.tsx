@@ -24,12 +24,12 @@ export default function Index() {
   let optimisticTodos = fetchers.reduce<{ id: string }[]>((memo, f) => {
     let id = f.formData?.get("id");
 
-    if (todos.map((t) => t.id).includes(id)) {
-      // console.log(todos);
-      // console.log(fetchers);
-      console.log(`Todo ${id} is in both!`);
-      // debugger;
-    }
+    // if (todos.map((t) => t.id).includes(id)) {
+    //   console.log(todos);
+    //   console.log(fetchers);
+    //   console.log(`Todo ${id} is in both!`);
+    //   debugger;
+    // }
 
     if (typeof id === "string") {
       memo.push({ id });
@@ -69,7 +69,9 @@ export default function Index() {
             .map((todo) => (
               <li
                 key={todo.id}
-                className={optimisticTodos.includes(todo) ? "opacity-25" : ""}
+                className={`transition ${
+                  optimisticTodos.includes(todo) ? "opacity-25" : ""
+                }`}
               >
                 {todo.id}
               </li>
