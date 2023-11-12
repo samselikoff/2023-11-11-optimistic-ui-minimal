@@ -7,9 +7,8 @@ export async function action({ request }: ActionFunctionArgs) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
   let clientId = formData.get("id") as string;
-  let serverId = clientId.replace("optimistic", "server");
 
-  db.todos.push({ id: serverId });
+  db.todos.push({ id: clientId });
 
   return true;
 }
@@ -25,6 +24,13 @@ export default function Index() {
   let optimisticTodos = fetchers.reduce<{ id: string }[]>((memo, f) => {
     let id = f.formData?.get("id");
 
+    if (todos.map((t) => t.id).includes(id)) {
+      console.log(todos);
+      console.log(fetchers);
+      debugger;
+      // console.log("BUG");
+    }
+
     if (typeof id === "string") {
       memo.push({ id });
     }
@@ -32,19 +38,23 @@ export default function Index() {
     return memo;
   }, []);
 
-  let nextId = `optimistic ${todos.length + optimisticTodos.length}`;
-
   todos = [...todos, ...optimisticTodos];
 
+  // console.log(
+  //   todos.map((t) => `${t.id} ${optimisticTodos.includes(t) ? "*" : ""}`)
+  // );
+
   return (
-    <div className="max-w-sm mx-auto p-8">
+    <div className="max-w-lg mx-auto p-8">
       <Form
         onSubmit={(e) => {
           e.preventDefault();
 
+          let tempId = window.crypto.randomUUID();
+
           submit(
-            { id: nextId },
-            { method: "POST", fetcherKey: nextId, navigate: false }
+            { id: tempId },
+            { method: "POST", fetcherKey: tempId, navigate: false }
           );
         }}
       >
@@ -56,12 +66,17 @@ export default function Index() {
       <div className="mt-8">
         <p>Todos:</p>
 
-        <ul className="list-disc pl-4 space-y-4">
+        <ul className="list-disc pl-4 space-y-4 mt-4">
           {todos
             .slice()
             .reverse()
             .map((todo) => (
-              <li key={todo.id}>{todo.id}</li>
+              <li
+                key={todo.id}
+                className={optimisticTodos.includes(todo) ? "opacity-25" : ""}
+              >
+                {todo.id}
+              </li>
             ))}
         </ul>
       </div>
