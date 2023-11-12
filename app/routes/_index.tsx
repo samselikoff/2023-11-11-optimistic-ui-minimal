@@ -3,8 +3,8 @@ import { Form, useFetchers, useLoaderData, useSubmit } from "@remix-run/react";
 import { db } from "~/db.server";
 
 export async function action({ request }: ActionFunctionArgs) {
-  let formData = await request.formData();
   await new Promise((resolve) => setTimeout(resolve, 1000));
+  let formData = await request.formData();
 
   let clientId = formData.get("id") as string;
 
@@ -24,12 +24,12 @@ export default function Index() {
   let optimisticTodos = fetchers.reduce<{ id: string }[]>((memo, f) => {
     let id = f.formData?.get("id");
 
-    // if (todos.map((t) => t.id).includes(id)) {
-    //   console.log(todos);
-    //   console.log(fetchers);
-    //   console.log(`Todo ${id} is in both!`);
-    //   debugger;
-    // }
+    if (todos.map((t) => t.id).includes(id)) {
+      console.log(todos);
+      console.log(fetchers);
+      console.log(`Todo ${id} is in both!`);
+      debugger;
+    }
 
     if (typeof id === "string") {
       memo.push({ id });
