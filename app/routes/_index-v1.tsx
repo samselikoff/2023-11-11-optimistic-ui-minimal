@@ -1,5 +1,6 @@
 import { type ActionFunctionArgs } from "@remix-run/node";
-import { Form, useFetchers, useLoaderData, useSubmit } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
+import { useState } from "react";
 import { db } from "~/db.server";
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -19,39 +20,34 @@ export function loader() {
 }
 
 export default function Index() {
-  let submit = useSubmit();
   let todos = useLoaderData<typeof loader>();
-  let fetchers = useFetchers();
-  let optimisticTodos = fetchers.reduce<{ id: string }[]>((memo, f) => {
-    let id = f.formData?.get("id");
-
-    if (typeof id === "string") {
-      memo.push({ id });
-    }
-
-    return memo;
-  }, []);
-
-  let nextId = `optimistic ${todos.length + optimisticTodos.length}`;
+  let [optimisticTodos, setOptimisticTodos] = useState<{ id: string }[]>([]);
+  let fetcher = useFetcher();
+  let nextId = todos.length + optimisticTodos.length;
 
   todos = [...todos, ...optimisticTodos];
 
+  if (fetcher.state === "idle" && fetcher.data && optimisticTodos.length > 0) {
+    setOptimisticTodos([]);
+  }
+
   return (
     <div className="max-w-sm mx-auto p-8">
-      <Form
+      <fetcher.Form
         onSubmit={(e) => {
           e.preventDefault();
 
-          submit(
-            { id: nextId },
-            { method: "POST", fetcherKey: nextId, navigate: false }
-          );
+          let id = `optimistic ${nextId}`;
+
+          setOptimisticTodos((todos) => [...todos, { id }]);
+
+          fetcher.submit({ id }, { method: "POST" });
         }}
       >
         <button className="bg-sky-500 text-white font-medium px-3 py-2">
           Add a todo
         </button>
-      </Form>
+      </fetcher.Form>
 
       <div className="mt-8">
         <p>Todos:</p>
