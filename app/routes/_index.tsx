@@ -1,20 +1,18 @@
 import { type ActionFunctionArgs } from "@remix-run/node";
 import { Form, useFetchers, useLoaderData, useSubmit } from "@remix-run/react";
-import { db } from "~/db.server";
+import { addTodo, getTodos } from "~/db.server";
 
 export async function action({ request }: ActionFunctionArgs) {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
   let formData = await request.formData();
+  let id = formData.get("id") as string;
 
-  let clientId = formData.get("id") as string;
-
-  db.todos.push({ id: clientId });
+  await addTodo(id);
 
   return true;
 }
 
 export function loader() {
-  return db.todos;
+  return getTodos();
 }
 
 export default function Index() {
